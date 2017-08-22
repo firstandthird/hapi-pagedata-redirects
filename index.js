@@ -1,3 +1,5 @@
+const useragent = require('useragent');
+
 module.exports = (server, options, next) => {
   server.ext('onPreResponse', (request, reply) => {
     if (request.response.statusCode !== 404) {
@@ -10,15 +12,28 @@ module.exports = (server, options, next) => {
         return reply.continue();
       }
 
+      const logData = {
+        remoteAddress: `${request.info.remoteAddress}:${request.info.remotePort}`,
+        host: request.info.host,
+        userAgent: request.headers['user-agent'],
+        browser: useragent.parse(request.headers['user-agent']).toString(),
+        referrer: request.info.referrer,
+        routePath: request.route.path,
+        from: request.path
+      };
+
       if (!content || !content[slug]) {
-        server.log(['hapi-pagedata-redirect', 'not-found', 'info'], { slug });
+        server.log(['hapi-pagedata-redirect', 'not-found', 'info'], logData);
+
         return reply.continue();
       }
 
-      server.log(['hapi-pagedata-redirect', 'redirect', 'info'], { slug, url: content[slug] });
+      logData.to = content[slug];
+
+      server.log(['hapi-pagedata-redirect', 'redirect', 'info'], logData);
 
       reply.redirect(content[slug]);
-    })
+    });
   });
 };
 
