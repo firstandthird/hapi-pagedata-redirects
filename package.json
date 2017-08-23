@@ -29,7 +29,10 @@
     "hapi-pagedata": "^1.1.1"
   },
   "eslintConfig": {
-    "extends": "firstandthird"
+    "extends": "firstandthird",
+    "rules": {
+      "strict": 0
+    }
   },
   "dependencies": {
     "useragent": "^2.2.1"

@@ -12,13 +12,15 @@ module.exports = (server, options, next) => {
         return reply.continue();
       }
 
+      const slug = request.route.path;
+
       const logData = {
         remoteAddress: `${request.info.remoteAddress}:${request.info.remotePort}`,
         host: request.info.host,
         userAgent: request.headers['user-agent'],
         browser: useragent.parse(request.headers['user-agent']).toString(),
         referrer: request.info.referrer,
-        routePath: request.route.path,
+        routePath: slug,
         from: request.path
       };
 
@@ -39,6 +41,6 @@ module.exports = (server, options, next) => {
 
 module.exports.attributes = {
   name: 'hapi-pagedata-redirects',
-  pkg: require('package.json'),
+  pkg: require('./package.json'),
   dependencies: 'hapi-pagedata'
-}
+};
