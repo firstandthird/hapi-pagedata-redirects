@@ -4,6 +4,7 @@
   "description": "Redirects from pagedata",
   "main": "index.js",
   "scripts": {
+    "example": "nodemon example/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "First+Third",
@@ -26,7 +27,8 @@
     "eslint-config-firstandthird": "^3.2.0",
     "eslint-plugin-import": "^2.1.0",
     "hapi": "^16.5.2",
-    "hapi-pagedata": "^1.1.1"
+    "hapi-pagedata": "^1.1.1",
+    "nodemon": "^1.11.0"
   },
   "eslintConfig": {
     "extends": "firstandthird",

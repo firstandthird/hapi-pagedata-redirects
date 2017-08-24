@@ -1,5 +1,3 @@
-'use strict';
-
 const Hapi = require('hapi');
 const port = process.env.PORT || 8080;
 
@@ -16,8 +14,8 @@ server.register([
   {
     register: require('hapi-pagedata'),
     options: {
-      host: process.env.PAGEDATA_HOST || `http://localhost:${port}`,
-      key: process.env.PAGEDATA_KEY || 'key',
+      host: 'http://pagedata.dev',
+      key: 'c-b884fc0a-a24a-46ac-aa96-f09b6e00f2db',
       status: 'draft',
       enablePageCache: false,
       enableProjectPagesCache: false,
@@ -28,7 +26,7 @@ server.register([
   {
     register: require('../'),
     options: {
-      redirectSlug: 'project-redirects'
+      redirectSlug: 'hapi-pagedata-redirects-redirects'
     }
   }
 ], err => {
@@ -41,6 +39,30 @@ server.register([
     method: 'get',
     handler: (request, reply) => {
       reply({ exists: true });
+    }
+  });
+
+  server.route({
+    path: '/test1',
+    method: 'get',
+    handler: (request, reply) => {
+      reply({ redirect: true });
+    }
+  });
+
+  server.route({
+    path: '/color/{color}',
+    method: 'get',
+    handler: (request, reply) => {
+      reply('This shouldn\'t show up');
+    }
+  });
+
+  server.route({
+    path: '/test/{test}',
+    method: 'get',
+    handler: (request, reply) => {
+      reply('This shouldn\'t show up');
     }
   });
 
