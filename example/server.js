@@ -1,5 +1,3 @@
-'use strict';
-
 const Hapi = require('hapi');
 const port = process.env.PORT || 8080;
 
@@ -28,7 +26,7 @@ server.register([
   {
     register: require('../'),
     options: {
-      redirectSlug: 'project-redirects'
+      redirectSlug: process.env.PAGEDATA_SLUG || 'redirects'
     }
   }
 ], err => {
@@ -37,10 +35,31 @@ server.register([
   }
 
   server.route({
+    path: '/api/pages/{page}',
+    method: 'GET',
+    handler(request, reply) {
+      reply({
+        content: {
+          '/color/{color}': '/test/{color}',
+          '/something-cool': '/test/cool'
+        }
+      });
+    }
+  });
+
+  server.route({
     path: '/',
     method: 'get',
     handler: (request, reply) => {
       reply({ exists: true });
+    }
+  });
+
+  server.route({
+    path: '/test/{param}',
+    method: 'get',
+    handler: (request, reply) => {
+      reply({ param: request.params.param });
     }
   });
 

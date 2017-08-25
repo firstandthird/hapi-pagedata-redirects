@@ -1,8 +1,10 @@
+const paramReplacer = require('./param-replacer');
 const useragent = require('useragent');
+const Call = require('call');
 
 module.exports = (server, options, next) => {
   server.ext('onPreResponse', (request, reply) => {
-    if (request.response.statusCode !== 404) {
+    if (request.response.isBoom && request.response.output.statusCode !== 404) {
       return reply.continue();
     }
 
@@ -12,7 +14,9 @@ module.exports = (server, options, next) => {
         return reply.continue();
       }
 
-      const slug = request.route.path;
+      const router = new Call.Router();
+      const route = request.route.path;
+      const path = request.path;
 
       const logData = {
         remoteAddress: `${request.info.remoteAddress}:${request.info.remotePort}`,
@@ -20,23 +24,37 @@ module.exports = (server, options, next) => {
         userAgent: request.headers['user-agent'],
         browser: useragent.parse(request.headers['user-agent']).toString(),
         referrer: request.info.referrer,
-        routePath: slug,
+        routePath: route,
         from: request.path
       };
 
-      if (!content || !content[slug]) {
+      if (!content) {
         server.log(['hapi-pagedata-redirect', 'not-found', 'info'], logData);
-
         return reply.continue();
       }
 
-      logData.to = content[slug];
+      Object.entries(content).forEach(([paramName, param]) => {
+        router.add({ method: 'get', path: paramName });
+      });
+
+      const match = router.route('get', path, request.host);
+
+      if (!match.route) {
+        server.log(['hapi-pagedata-redirect', 'not-found', 'info'], logData);
+        return reply.continue();
+      }
+
+      const redirectTo = paramReplacer(content[match.route], match.params);
+
+      logData.to = redirectTo;
 
       server.log(['hapi-pagedata-redirect', 'redirect', 'info'], logData);
 
-      reply.redirect(content[slug]);
+      reply.redirect(redirectTo);
     });
   });
+
+  next();
 };
 
 module.exports.attributes = {

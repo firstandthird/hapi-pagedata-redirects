@@ -1,0 +1,7 @@
+{
+  "env": {
+    "PORT": 8181,
+    "PAGEDATA_HOST": "http://pagedata.dev",
+    "PAGEDATA_KEY": "c-b884fc0a-a24a-46ac-aa96-f09b6e00f2db"
+  }
+}
