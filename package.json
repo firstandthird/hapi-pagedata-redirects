@@ -37,6 +37,7 @@
     }
   },
   "dependencies": {
+    "call": "^4.0.2",
     "useragent": "^2.2.1"
   }
 }

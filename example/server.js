@@ -14,8 +14,8 @@ server.register([
   {
     register: require('hapi-pagedata'),
     options: {
-      host: 'http://pagedata.dev',
-      key: 'c-b884fc0a-a24a-46ac-aa96-f09b6e00f2db',
+      host: process.env.PAGEDATA_HOST || `http://localhost:${port}`,
+      key: process.env.PAGEDATA_KEY || 'key',
       status: 'draft',
       enablePageCache: false,
       enableProjectPagesCache: false,
@@ -26,13 +26,26 @@ server.register([
   {
     register: require('../'),
     options: {
-      redirectSlug: 'hapi-pagedata-redirects-redirects'
+      redirectSlug: process.env.PAGEDATA_SLUG || 'redirects'
     }
   }
 ], err => {
   if (err) {
     throw err;
   }
+
+  server.route({
+    path: '/api/pages/{page}',
+    method: 'GET',
+    handler(request, reply) {
+      reply({
+        content: {
+          '/color/{color}': '/test/{color}',
+          '/something-cool': '/test/cool'
+        }
+      });
+    }
+  });
 
   server.route({
     path: '/',
@@ -43,26 +56,10 @@ server.register([
   });
 
   server.route({
-    path: '/test1',
+    path: '/test/{param}',
     method: 'get',
     handler: (request, reply) => {
-      reply({ redirect: true });
-    }
-  });
-
-  server.route({
-    path: '/color/{color}',
-    method: 'get',
-    handler: (request, reply) => {
-      reply('This shouldn\'t show up');
-    }
-  });
-
-  server.route({
-    path: '/test/{test}',
-    method: 'get',
-    handler: (request, reply) => {
-      reply('This shouldn\'t show up');
+      reply({ param: request.params.param });
     }
   });
 

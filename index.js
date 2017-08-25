@@ -1,5 +1,6 @@
 const paramReplacer = require('./param-replacer');
 const useragent = require('useragent');
+const Call = require('call');
 
 module.exports = (server, options, next) => {
   server.ext('onPreResponse', (request, reply) => {
@@ -13,6 +14,7 @@ module.exports = (server, options, next) => {
         return reply.continue();
       }
 
+      const router = new Call.Router();
       const route = request.route.path;
       const path = request.path;
 
@@ -31,21 +33,18 @@ module.exports = (server, options, next) => {
         return reply.continue();
       }
 
-      let redirectTo = '';
+      Object.entries(content).forEach(([paramName, param]) => {
+        router.add({ method: 'get', path: paramName });
+      });
 
-      // Check if direct path matches first
-      if (content[path]) {
-        redirectTo = content[path];
+      const match = router.route('get', path, request.host);
 
-      // Check for variable redirects
-      } else {
-        if (!content[route]) {
-          server.log(['hapi-pagedata-redirect', 'not-found', 'info'], logData);
-          return reply.continue();
-        }
-
-        redirectTo = paramReplacer(content[route], request.params);
+      if (!match.route) {
+        server.log(['hapi-pagedata-redirect', 'not-found', 'info'], logData);
+        return reply.continue();
       }
+
+      const redirectTo = paramReplacer(content[match.route], match.params);
 
       logData.to = redirectTo;
 
