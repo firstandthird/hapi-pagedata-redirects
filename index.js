@@ -4,7 +4,7 @@ const Call = require('call');
 
 module.exports = (server, options, next) => {
   server.ext('onPreResponse', (request, reply) => {
-    if (request.response.isBoom && request.response.output.statusCode !== 404) {
+    if ((request.response.statusCode && request.response.statusCode !== 404) || (request.response.isBoom && request.response.output.statusCode !== 404)) {
       return reply.continue();
     }
 
