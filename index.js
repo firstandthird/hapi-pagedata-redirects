@@ -29,7 +29,6 @@ module.exports = (server, options, next) => {
       };
 
       if (!content) {
-        server.log(['hapi-pagedata-redirect', 'not-found', 'info'], logData);
         return reply.continue();
       }
 
@@ -40,7 +39,6 @@ module.exports = (server, options, next) => {
       const match = router.route('get', path, request.host);
 
       if (!match.route) {
-        server.log(['hapi-pagedata-redirect', 'not-found', 'info'], logData);
         return reply.continue();
       }
 
